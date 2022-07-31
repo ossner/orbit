@@ -1,0 +1,25 @@
+#!/bin/sh
+
+TYPE=$(gum choose rsa dsa ed25519 ecdsa)
+
+if [ $TYPE="" ]; then
+    echo "Default type has been set to RSA"
+    TYPE="rsa"
+fi
+
+HOST=$(gum input --prompt="> " --placeholder="Host URL")
+
+if [ "$HOST" = "" ]; then
+    echo "Host can not be empty"
+    exit 0
+fi
+
+ssh-keygen -t $TYPE -f ~/.ssh/id_$TYPE-$HOST
+
+echo "" >> ~/.ssh/config
+echo "Host $HOST" >> ~/.ssh/config
+echo "        Preferredauthentications publickey" >> ~/.ssh/config
+echo "        IdentityFile ~/.ssh/id_$TYPE-$HOST" >> ~/.ssh/config
+
+echo "SSH Key generated and added to config:"
+cat ~/.ssh/id_$TYPE-$HOST.pub

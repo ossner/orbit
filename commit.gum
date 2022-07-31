@@ -1,0 +1,48 @@
+#!/bin/sh
+
+UNTRACKED_FILES=$(git diff --name-only HEAD)
+
+NEW_FILES=$(git ls-files --others --exclude-standard)
+
+# Choose which files to commit from all files
+FILES=$(gum choose $UNTRACKED_FILES $NEW_FILES --no-limit)
+
+# If there are no files selected or nothing has changed, exit
+if [ "$FILES" = "" ]; then
+	echo "Nothing to commit"
+	exit 0
+fi
+
+# Add all files 
+for FILE in $FILES
+do
+	git add "$FILE"
+done
+
+TYPE=$(gum choose "fix" "feat" "docs" "style" "refactor" "test" "chore" "revert")
+if [ "$TYPE" = "" ]; then
+	echo "Type is required"
+	exit 0
+fi
+
+SCOPE=$(gum input --placeholder "scope")
+
+# Since the scope is optional, wrap it in parentheses if it has a value.
+test -n "$SCOPE" && SCOPE="($SCOPE)"
+
+# Pre-populate the input with the type(scope): so that the user may change it
+SUMMARY=$(gum input --prompt "> $TYPE$SCOPE: " --placeholder "Summary of this change")
+
+SUMMARY="$TYPE$SCOPE: $SUMMARY"
+
+DESCRIPTION=$(gum write --placeholder "Details of this change (reference issues with #)")
+
+# Show a summary of the commit
+SUMMARYBOX=$(gum style --padding "0 3" --margin "1 1 0 1" --align center --border double --width 50 --border-foreground 212 "$SUMMARY")
+test -n "$DESCRIPTION" && DESCRIPTIONBOX=$(gum style --padding "0 2" --margin "0 1 1 1" --border double --width 50 --border-foreground 57 "$DESCRIPTION")
+gum join --align left --vertical "$SUMMARYBOX" "$DESCRIPTIONBOX"
+
+# Commit these changes
+gum confirm "Commit changes?" \
+&& git commit -m "$SUMMARY" -m "$DESCRIPTION" \
+|| echo "I'll be waiting"
