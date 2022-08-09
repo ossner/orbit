@@ -1,5 +1,5 @@
 # Orbit
-A collection of (in my opinion) useful shell scripts that use the gum command line project to produce beautiful, easy-to-use tools that every developer needs.
+A collection of (in my opinion) useful shell scripts that use the [gum command line](https://github.com/charmbracelet/gum) project to produce beautiful, easy-to-use tools that every developer needs.
 
 ## Git
 Using [commit.gum](commit.gum), you can quickly write commits that adhere to [Conventional Commits](https://conventionalcommits.org) specifications.
