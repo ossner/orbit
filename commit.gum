@@ -2,8 +2,9 @@
 
 # Check if directory is git repository
 git -C . rev-parse
-if [ $? != 0 ]; then
-	exit $? # Exit and throw same error
+ERR_CODE=$?
+if [ $ERR_CODE != 0 ]; then
+	exit $ERR_CODE # Exit and throw same error
 fi
 
 UNTRACKED_FILES=$(git diff --name-only HEAD)
