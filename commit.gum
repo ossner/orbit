@@ -1,5 +1,11 @@
 #!/bin/sh
 
+# Check if directory is git repository
+git -C . rev-parse
+if [ $? != 0 ]; then
+	exit $? # Exit and throw same error
+fi
+
 UNTRACKED_FILES=$(git diff --name-only HEAD)
 
 NEW_FILES=$(git ls-files --others --exclude-standard)
@@ -32,6 +38,11 @@ test -n "$SCOPE" && SCOPE="($SCOPE)"
 
 # Pre-populate the input with the type(scope): so that the user may change it
 SUMMARY=$(gum input --prompt "> $TYPE$SCOPE: " --placeholder "Summary of this change")
+# Summary is required as per conventionalcommits.org specs
+if [ "$SUMMARY" = "" ]; then
+	echo "Summary is required"
+	exit 0
+fi
 
 SUMMARY="$TYPE$SCOPE: $SUMMARY"
 
